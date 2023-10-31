@@ -7,7 +7,7 @@ import { Box, Typography } from '@mui/material';
 const Header = () => {
   return (
     <Box sx={{ width: '100%', maxWidth: '1440px', marginX: 'auto' }}>
-      <Box sx={{ padding: '10px 27px' }}>
+      <Box sx={{ padding: '10px 27px', width: 'fit-content' }}>
         <Link to='/'>
           <Image src={logo} width={40} height={40} />
         </Link>

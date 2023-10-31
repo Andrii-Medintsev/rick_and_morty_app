@@ -1,90 +1,41 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import {
   Box,
-  Card,
-  CardContent,
-  CardMedia,
   Pagination,
-  PaginationItem,
-  Typography,
+  PaginationItem
 } from '@mui/material';
-import Filter from '../component/Filter';
-// import characters from '../staticCharacters.json';
 import { useEffect, useState } from 'react';
-import episodes from '../staticEpisodes.json';
-import { queryFetch } from '../utils';
-
-type CharacterType = {
-  id: number;
-  name: string;
-  status: string;
-  species: string;
-  type: string;
-  gender: string;
-  origin: {
-    name: string;
-    url: string;
-  };
-  location: {
-    name: string;
-    url: string;
-  };
-  image: string;
-  episode: string[] | [];
-  url: string;
-  created: string;
-};
+import CharacterCard from '../component/CharacterCard';
+import Filter from '../component/Filter';
+import { CharacterType } from '../types/CharacterType';
+import { getCharacters } from '../utils/getCharacters';
 
 const Home = () => {
   const [characters, setCharacters] = useState<CharacterType[] | []>([]);
   const [pages, setPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const getCharacters = () => {
-    queryFetch(`
-      query {
-        characters (page: ${currentPage}) {
-          info {
-            count
-            pages
-          }
-          results {
-            id
-            name
-            image
-            status
-            species
-            location {
-              name
-            }
-            episode {
-              id
-            }
-          }
-        }
-      }
-      `)
-      .then((res) => {
-        setCharacters(res.results);
-        setPages(res.info.pages);
-        console.log(res.results);
-      })
-      .catch((err) => console.log(err));
-  };
-
   useEffect(() => {
-    getCharacters();
+    getCharacters(currentPage)
+      .then(res => {
+        setCharacters(res.results);
+        setPages(res.info.pages)
+      })
   }, [currentPage]);
 
-  const getEpisode = (url: string) => {
-    const ep = episodes.results.find((e) => e.url === url);
+  // const getEpisode = (id: string) => {
+  //   let name;
 
-    return ep?.name || 'Blablabla';
-  };
+  //   queryFetch(`
+  //     query {
+  //       episodesByIds(ids: ${id}) {
+  //       name
+  //     }
+  //   }`)
+  //     .then(res => name = res.episodesByIds[0].name)
 
-  const capitalize = (word: string) => {
-    return word[0].toUpperCase() + word.slice(1).toLowerCase();
-  };
+  //   return name;
+  // };
 
   return (
     <Box sx={{ maxWidth: '1280px', margin: 'auto' }}>
@@ -101,112 +52,7 @@ const Home = () => {
         {characters && characters.length > 0 && (
           <>
             {characters.map((c) => (
-              <Card
-                key={c.id}
-                sx={{
-                  display: 'flex',
-                  flexBasis: '48%',
-                  flexGrow: 2,
-                  background: '#3C3E44',
-                  borderRadius: '9px',
-                  color: '#f5f5f5',
-                }}
-              >
-                <CardMedia
-                  component='img'
-                  sx={{ width: 220 }}
-                  image={c.image}
-                  alt={c.name}
-                />
-                <CardContent
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                  }}
-                >
-                  <Box>
-                    <Typography
-                      variant='h5'
-                      component='div'
-                      sx={{
-                        fontSize: 27,
-                        fontWeight: 800,
-                      }}
-                    >
-                      {c.name}
-                    </Typography>
-
-                    <Typography
-                      sx={{
-                        fontSize: 16,
-                        fontWeight: 500,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '7px',
-                        '&::before': {
-                          content: '""',
-                          display: 'block',
-                          width: '9px',
-                          height: '9px',
-                          backgroundColor: `${
-                            c.status === 'Alive'
-                              ? '#55CC44'
-                              : c.status === 'Dead'
-                              ? '#D63D2E'
-                              : '#9e9e9e'
-                          }`,
-                          borderRadius: '50%',
-                        },
-                      }}
-                    >
-                      {`${c.status} - ${c.species}`}
-                    </Typography>
-                  </Box>
-
-                  <Box>
-                    <Typography
-                      color='#9e9e9e'
-                      sx={{
-                        fontSize: 15,
-                        fontWeight: 500,
-                      }}
-                    >
-                      Last known location:
-                    </Typography>
-
-                    <Typography
-                      sx={{
-                        fontSize: 18,
-                        fontWeight: 400,
-                      }}
-                    >
-                      {c.location.name}
-                    </Typography>
-                  </Box>
-
-                  <Box>
-                    <Typography
-                      color='#9e9e9e'
-                      sx={{
-                        fontSize: 15,
-                        fontWeight: 500,
-                      }}
-                    >
-                      First seen in:
-                    </Typography>
-
-                    <Typography
-                      sx={{
-                        fontSize: 18,
-                        fontWeight: 400,
-                      }}
-                    >
-                      {getEpisode(c.episode[0])}
-                    </Typography>
-                  </Box>
-                </CardContent>
-              </Card>
+              <CharacterCard key={c.id} character={c}/>
             ))}
           </>
         )}

@@ -7,5 +7,5 @@ export const queryFetch = (query: string) => {
     }),
   })
     .then((res) => res.json())
-    .then(data => data.data.characters);
+    .then(data => data.data);
 };

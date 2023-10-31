@@ -3,9 +3,25 @@ import Footer from './component/Footer';
 import Header from './component/Header';
 import Home from './pages/HomePage';
 import { Route, Routes } from 'react-router-dom';
+import { grey } from '@mui/material/colors';
+import CharacterPage from './pages/CharacterPage';
 
 const theme = createTheme({
   components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          color: '#272B33',
+          width: '140px',
+          height: '60px',
+          fontWeight: 400,
+          backgroundColor: grey[100],
+          '&:hover': {
+            backgroundColor: grey[200],
+          },
+        },
+      },
+    },
     MuiPaginationItem: {
       styleOverrides: {
         root: {
@@ -44,8 +60,7 @@ const App = () => {
           sx={{
             background: '#272B33',
             paddingX: '100px',
-            paddingTop: '40px',
-            paddingBottom: '16px',
+            paddingY: '40px',
             flex: 1,
           }}
         >
@@ -53,7 +68,7 @@ const App = () => {
             <Route path='/' element={<Home />} />
             <Route
               path='/character/:id'
-              element={<h1>Charactersfg sdfgsdfg</h1>}
+              element={<CharacterPage />}
             />
           </Routes>
         </Box>
