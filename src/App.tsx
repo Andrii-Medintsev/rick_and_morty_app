@@ -25,18 +25,36 @@ const theme = createTheme({
     MuiPaginationItem: {
       styleOverrides: {
         root: {
-          color: '#f5f5f5',
+          color: grey[100],
           '&.Mui-selected': {
-            backgroundColor: '#f5f5f5',
+            backgroundColor: grey[100],
             color: '#202329',
             '&:hover': {
-              backgroundColor: '#f5f5f5',
+              backgroundColor: grey[100],
             },
           },
           '&.MuiPaginationItem-previousNext': {
-            backgroundColor: '#f5f5f5',
-            color: '#272B33',
+            backgroundColor: grey[100],
+            color: '#202329',
+            '&:hover': {
+              backgroundColor: grey[100],
+            },
           },
+        },
+      },
+    },
+    MuiInputBase: {
+      styleOverrides: {
+        root: {
+          backgroundColor: grey[100],
+          height: '60px',
+        },
+      },
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          width: '230px',
         },
       },
     },
@@ -66,10 +84,7 @@ const App = () => {
         >
           <Routes>
             <Route path='/' element={<Home />} />
-            <Route
-              path='/character/:id'
-              element={<CharacterPage />}
-            />
+            <Route path='/character/:id' element={<CharacterPage />} />
           </Routes>
         </Box>
 
