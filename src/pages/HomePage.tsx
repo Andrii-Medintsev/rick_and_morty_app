@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
   Box,
   Card,
@@ -5,12 +6,13 @@ import {
   CardMedia,
   Pagination,
   PaginationItem,
-  Typography
+  Typography,
 } from '@mui/material';
 import Filter from '../component/Filter';
 // import characters from '../staticCharacters.json';
 import { useEffect, useState } from 'react';
 import episodes from '../staticEpisodes.json';
+import { queryFetch } from '../utils';
 
 type CharacterType = {
   id: number;
@@ -33,19 +35,46 @@ type CharacterType = {
   created: string;
 };
 
-const getAllCharacters = () => {
-  return fetch('https://rickandmortyapi.com/api/character')
-    .then((res) => res.json())
-    .then((res) => res.results);
-};
-
 const Home = () => {
-  const [characters1, setCharacters1] = useState<CharacterType[]>([]);
+  const [characters, setCharacters] = useState<CharacterType[] | []>([]);
+  const [pages, setPages] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const getCharacters = () => {
+    queryFetch(`
+      query {
+        characters (page: ${currentPage}) {
+          info {
+            count
+            pages
+          }
+          results {
+            id
+            name
+            image
+            status
+            species
+            location {
+              name
+            }
+            episode {
+              id
+            }
+          }
+        }
+      }
+      `)
+      .then((res) => {
+        setCharacters(res.results);
+        setPages(res.info.pages);
+        console.log(res.results);
+      })
+      .catch((err) => console.log(err));
+  };
 
   useEffect(() => {
-    getAllCharacters().then((res) => setCharacters1(res));
-  }),
-    [];
+    getCharacters();
+  }, [currentPage]);
 
   const getEpisode = (url: string) => {
     const ep = episodes.results.find((e) => e.url === url);
@@ -69,120 +98,124 @@ const Home = () => {
           marginBottom: '17px',
         }}
       >
-        <>
-          {characters1.map((c) => (
-            <Card
-              key={c.id}
-              sx={{
-                display: 'flex',
-                flexBasis: '48%',
-                flexGrow: 2,
-                background: '#3C3E44',
-                borderRadius: '9px',
-                color: '#f5f5f5',
-              }}
-            >
-              <CardMedia
-                component='img'
-                sx={{ width: 220 }}
-                image={c.image}
-                alt={c.name}
-              />
-              <CardContent
+        {characters && characters.length > 0 && (
+          <>
+            {characters.map((c) => (
+              <Card
+                key={c.id}
                 sx={{
                   display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
+                  flexBasis: '48%',
+                  flexGrow: 2,
+                  background: '#3C3E44',
+                  borderRadius: '9px',
+                  color: '#f5f5f5',
                 }}
               >
-                <Box>
-                  <Typography
-                    variant='h5'
-                    component='div'
-                    sx={{
-                      fontSize: 27,
-                      fontWeight: 800,
-                    }}
-                  >
-                    {c.name}
-                  </Typography>
+                <CardMedia
+                  component='img'
+                  sx={{ width: 220 }}
+                  image={c.image}
+                  alt={c.name}
+                />
+                <CardContent
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <Box>
+                    <Typography
+                      variant='h5'
+                      component='div'
+                      sx={{
+                        fontSize: 27,
+                        fontWeight: 800,
+                      }}
+                    >
+                      {c.name}
+                    </Typography>
 
-                  <Typography
-                    sx={{
-                      fontSize: 16,
-                      fontWeight: 500,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '7px',
-                      '&::before': {
-                        content: '""',
-                        display: 'block',
-                        width: '9px',
-                        height: '9px',
-                        backgroundColor: `${
-                          c.status === 'Alive'
-                            ? '#55CC44'
-                            : c.status === 'Dead'
-                            ? '#D63D2E'
-                            : '#9e9e9e'
-                        }`,
-                        borderRadius: '50%',
-                      },
-                    }}
-                  >
-                    {`${capitalize(c.status)} - ${c.species}`}
-                  </Typography>
-                </Box>
+                    <Typography
+                      sx={{
+                        fontSize: 16,
+                        fontWeight: 500,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '7px',
+                        '&::before': {
+                          content: '""',
+                          display: 'block',
+                          width: '9px',
+                          height: '9px',
+                          backgroundColor: `${
+                            c.status === 'Alive'
+                              ? '#55CC44'
+                              : c.status === 'Dead'
+                              ? '#D63D2E'
+                              : '#9e9e9e'
+                          }`,
+                          borderRadius: '50%',
+                        },
+                      }}
+                    >
+                      {`${c.status} - ${c.species}`}
+                    </Typography>
+                  </Box>
 
-                <Box>
-                  <Typography
-                    color='#9e9e9e'
-                    sx={{
-                      fontSize: 15,
-                      fontWeight: 500,
-                    }}
-                  >
-                    Last known location:
-                  </Typography>
+                  <Box>
+                    <Typography
+                      color='#9e9e9e'
+                      sx={{
+                        fontSize: 15,
+                        fontWeight: 500,
+                      }}
+                    >
+                      Last known location:
+                    </Typography>
 
-                  <Typography
-                    sx={{
-                      fontSize: 18,
-                      fontWeight: 400,
-                    }}
-                  >
-                    {c.location.name}
-                  </Typography>
-                </Box>
+                    <Typography
+                      sx={{
+                        fontSize: 18,
+                        fontWeight: 400,
+                      }}
+                    >
+                      {c.location.name}
+                    </Typography>
+                  </Box>
 
-                <Box>
-                  <Typography
-                    color='#9e9e9e'
-                    sx={{
-                      fontSize: 15,
-                      fontWeight: 500,
-                    }}
-                  >
-                    First seen in:
-                  </Typography>
+                  <Box>
+                    <Typography
+                      color='#9e9e9e'
+                      sx={{
+                        fontSize: 15,
+                        fontWeight: 500,
+                      }}
+                    >
+                      First seen in:
+                    </Typography>
 
-                  <Typography
-                    sx={{
-                      fontSize: 18,
-                      fontWeight: 400,
-                    }}
-                  >
-                    {getEpisode(c.episode[0])}
-                  </Typography>
-                </Box>
-              </CardContent>
-            </Card>
-          ))}
-        </>
+                    <Typography
+                      sx={{
+                        fontSize: 18,
+                        fontWeight: 400,
+                      }}
+                    >
+                      {getEpisode(c.episode[0])}
+                    </Typography>
+                  </Box>
+                </CardContent>
+              </Card>
+            ))}
+          </>
+        )}
       </Box>
 
       <Pagination
-        count={10}
+        count={pages}
+        page={currentPage}
+        onChange={(_, value) => setCurrentPage(value)}
         size='large'
         variant='outlined'
         shape='rounded'
