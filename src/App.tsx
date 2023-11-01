@@ -22,6 +22,22 @@ const theme = createTheme({
         },
       },
     },
+    MuiIconButton: {
+      styleOverrides: {
+        root: {
+          width: 56,
+          height: 56,
+          backgroundColor: '#fff',
+          color: '#3C3E44',
+          '&:hover': {
+            backgroundColor: grey[300],
+          },
+          '&:disabled': {
+            backgroundColor: grey[400],
+          }
+        }
+      }
+    },
     MuiPaginationItem: {
       styleOverrides: {
         root: {

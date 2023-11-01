@@ -20,18 +20,19 @@ const Header = () => {
           backgroundPosition: 'center',
         }}
       >
-        <Typography
-          sx={{
-            height: 345,
-            fontSize: 100,
-            fontWeight: 900,
-            display: 'grid',
-            placeContent: 'center',
-            backgroundImage: { bg },
-          }}
-        >
-          The Rick and Morty API
-        </Typography>
+
+      <Typography
+        sx={{
+          height: 345,
+          fontSize: 100,
+          fontWeight: 900,
+          display: 'grid',
+          placeContent: 'center',
+          backgroundImage: { bg },
+        }}
+      >
+        The Rick and Morty API
+      </Typography>
       </Box>
     </Box>
   );

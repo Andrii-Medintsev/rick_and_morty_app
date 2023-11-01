@@ -1,22 +1,121 @@
-import { Box, Button, Modal, TextField } from '@mui/material';
+import { Box, Button, TextField } from '@mui/material';
 import { useState } from 'react';
+import { CharacterType } from '../types/CharacterType';
+import { getFilteredCharacters } from '../utils/getFIlteredCharacters';
 import { SelectItem } from './SelectItem';
+import { getCharactersByLocation } from '../utils/getCharactersByLocation';
 
-const Filter = () => {
+type Props = {
+  onSetCharacters: (c: CharacterType[]) => void;
+  onSetPages: (pages: number) => void;
+  onChangeNoQueryMatch: (isVisible: boolean) => void;
+};
+
+const Filter: React.FC<Props> = ({
+  onSetCharacters,
+  onSetPages,
+  onChangeNoQueryMatch,
+}) => {
   const [searchOptions, setSearchOption] = useState<string[]>([]);
   const [filterVisible, setFilterVisible] = useState(false);
+  const [generalQuery, setGeneralQuery] = useState('');
+
+  const [characterQueries, setCharacterQueries] = useState({
+    name: '',
+    status: '',
+    species: '',
+    type: '',
+    gender: '',
+  });
+
+  const [locationQueries, setLocationQueries] = useState({
+    name: '',
+    type: '',
+    dimension: '',
+  });
+
+  const [episodeQueries, setEpisodeQueries] = useState({
+    name: '',
+    episopdes: '',
+  });
+
+  const handleSearchOptions = (options: string[]) => {
+    setGeneralQuery('');
+    setSearchOption(options);
+  };
+
+  const handleCharacterQuery = (prop: string, value: string) => {
+    setCharacterQueries((prev) => {
+      const newState = { ...prev, [prop]: value };
+
+      return newState;
+    });
+  };
+
+  const handleLocationQuery = (prop: string, value: string) => {
+    setLocationQueries((prev) => {
+      const newState = { ...prev, [prop]: value };
+
+      return newState;
+    });
+  };
+
+  const handleEpisodeQuery = (prop: string, value: string) => {
+    setEpisodeQueries((prev) => {
+      const newState = { ...prev, [prop]: value };
+
+      return newState;
+    });
+  };
+
+  const resetQueries = () => {
+    setGeneralQuery('');
+    setSearchOption([]);
+    setCharacterQueries({
+      name: '',
+      status: '',
+      species: '',
+      type: '',
+      gender: '',
+    });
+
+    setLocationQueries({
+      name: '',
+      type: '',
+      dimension: '',
+    });
+
+    setEpisodeQueries({
+      name: '',
+      episopdes: '',
+    });
+  };
 
   const handleFilterVisibility = () => {
     setFilterVisible(!filterVisible);
-    setSearchOption([]);
+
+    resetQueries();
   };
 
-  const handleModalClose = () => {
-    setFilterVisible(false);
-  };
+  // const handleModalClose = () => {
+  //   setFilterVisible(false);
+  // };
 
-  const handleSubmit = () => {
-    setFilterVisible(false);
+  const handleSubmit = async () => {
+    const filterdCharacters = await getFilteredCharacters(characterQueries);
+    const charactersByLocation = await getCharactersByLocation(locationQueries);
+
+    console.log(charactersByLocation.results);
+
+    if (!filterdCharacters.results.length || !charactersByLocation.results.length) {
+      onChangeNoQueryMatch(true);
+      return;
+    }
+
+    onSetCharacters(filterdCharacters.results);
+    onSetPages(charactersByLocation.info.pages);
+
+    resetQueries();
   };
 
   return (
@@ -28,13 +127,11 @@ const Filter = () => {
       >
         {filterVisible ? 'Remove filter' : 'Filter'}
       </Button>
-
-      <Modal open={filterVisible} onClose={handleModalClose}>
-        {/* {filterVisible && ( */}
-        <Box sx={{ position: 'relative', top: 445, left: '30%' }}>
+      {filterVisible && (
+        <Box sx={{ position: 'relative' }}>
           <SelectItem
             searchOptions={searchOptions}
-            onOptionChange={setSearchOption}
+            onOptionChange={handleSearchOptions}
           />
           <Box
             sx={{
@@ -50,30 +147,52 @@ const Filter = () => {
               <TextField
                 placeholder='Add keywords to find'
                 variant='outlined'
+                onChange={(e) => setGeneralQuery(e.target.value)}
               />
             )}
+
             {searchOptions.includes('Character') && (
               <>
-                <TextField placeholder='Add Name' variant='outlined' />
-                <TextField placeholder='Add Status' variant='outlined' />
-                <TextField placeholder='Add Species' variant='outlined' />
-                <TextField placeholder='Add Type' variant='outlined' />
-                <TextField placeholder='Add Gender' variant='outlined' />
+                {['Name', 'Status', 'Species', 'Type', 'Gender'].map((item) => (
+                  <TextField
+                    key={item}
+                    placeholder={`Add ${item}`}
+                    variant='outlined'
+                    onChange={(e) =>
+                      handleCharacterQuery(item.toLowerCase(), e.target.value)
+                    }
+                  />
+                ))}
               </>
             )}
 
             {searchOptions.includes('Location') && (
               <>
-                <TextField placeholder='Add Location Name' variant='outlined' />
-                <TextField placeholder='Add Location Type' variant='outlined' />
-                <TextField placeholder='Add Dimension' variant='outlined' />
+                {['Name', 'Type', 'Dimension'].map((item) => (
+                  <TextField
+                    key={item}
+                    placeholder={`Add Location ${item}`}
+                    variant='outlined'
+                    onChange={(e) =>
+                      handleLocationQuery(item.toLowerCase(), e.target.value)
+                    }
+                  />
+                ))}
               </>
             )}
 
             {searchOptions.includes('Episodes') && (
               <>
-                <TextField placeholder='Add Episode Name' variant='outlined' />
-                <TextField placeholder='Add Episodes' variant='outlined' />
+                {['Name', 'Episodes'].map((item) => (
+                  <TextField
+                    key={item}
+                    placeholder={`Add ${item}`}
+                    variant='outlined'
+                    onChange={(e) =>
+                      handleEpisodeQuery(item.toLowerCase(), e.target.value)
+                    }
+                  />
+                ))}
               </>
             )}
           </Box>
@@ -85,8 +204,11 @@ const Filter = () => {
             Find
           </Button>
         </Box>
-        {/* )} */}
-      </Modal>
+      )}
+
+      {/* <Modal open={filterVisible} onClose={handleModalClose}>
+        <Box></Box>
+      </Modal> */}
     </Box>
   );
 };
