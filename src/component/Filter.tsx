@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Box, Button, TextField } from '@mui/material';
 import { useState } from 'react';
 import { CharacterType } from '../types/CharacterType';
-import { getFilteredCharacters } from '../utils/getFIlteredCharacters';
-import { SelectItem } from './SelectItem';
 import { getCharactersByLocation } from '../utils/getCharactersByLocation';
+import { getFilteredCharacters } from '../utils/getFilteredCharacters';
+import { SelectItem } from './SelectItem';
 
 type Props = {
   onSetCharacters: (c: CharacterType[]) => void;

@@ -2,6 +2,8 @@ import { Box, Card, CardContent, CardMedia, Typography } from '@mui/material';
 import { green } from '@mui/material/colors';
 import { Link } from 'react-router-dom';
 import { CharacterType } from '../types/CharacterType';
+import { useAppDispatch, useAppSelector } from '../app/hooks';
+import { addHistoryItem } from '../features/historySlice';
 
 type Props = {
   character: CharacterType;
@@ -11,13 +13,26 @@ const capitalize = (word: string) => {
   return word[0].toUpperCase() + word.slice(1).toLowerCase();
 };
 
+
 const CharacterCard: React.FC<Props> = ({ character }) => {
+  const dispatch = useAppDispatch();
+  const value = useAppSelector(state => state.history.value);
+
+  const handleAddToHistory = () => {
+    dispatch(addHistoryItem(character.name));
+
+    window.localStorage.setItem(
+      'history',
+      JSON.stringify([...value, character.name])
+    );
+  }
+
   return (
     <Card
       key={character.id}
       sx={{
         display: 'flex',
-        minWidth: '49%',
+        width: '48%',
         maxWidth: '100%',
         flexGrow: 1,
         background: '#3C3E44',
@@ -50,7 +65,12 @@ const CharacterCard: React.FC<Props> = ({ character }) => {
               },
             }}
           >
-            <Link to={`/character/${character.id}`}>{character.name}</Link>
+            <Link
+              to={`/character/${character.id}`}
+              onClick={handleAddToHistory}
+            >
+              {character.name}
+            </Link>
           </Typography>
 
           <Typography

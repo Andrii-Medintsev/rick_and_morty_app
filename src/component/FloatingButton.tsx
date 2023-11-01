@@ -6,8 +6,10 @@ import { useState } from 'react';
 import { AiOutlineExclamationCircle } from 'react-icons/ai';
 import { FiDownload } from 'react-icons/fi';
 import { useLocation } from 'react-router-dom';
+import { useAppSelector } from '../app/hooks';
 
 const FloatingButton = () => {
+  const value = useAppSelector((state) => state.history.value);
   const [isActive, setIsActive] = useState(false);
   const location = useLocation();
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
@@ -79,13 +81,32 @@ const FloatingButton = () => {
         open={drawerIsOpen}
         onClose={toggleDrawer}
       >
-        <Box sx={{ width: '250px' }}>
-          <Typography fontSize={20} fontWeight={500} sx={{ marginBottom: '16px' }}>
-            History
-          </Typography>
+        <Box>
+          <Box >
+            <Typography
+              fontSize={20}
+              fontWeight={500}
+              sx={{ marginBottom: '16px' }}
+            >
+              History
+            </Typography>
 
-          <Box>
-            Action 1
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '6px',
+                overflow: 'scroll',
+              }}
+            >
+              {value.map((item) => {
+                return (
+                  <Typography key={item}>
+                    {`You've watched info about ${item}`}
+                  </Typography>
+                );
+              })}
+            </Box>
           </Box>
 
           <Button
@@ -97,7 +118,8 @@ const FloatingButton = () => {
               width: 'fit-content',
               minWidth: 'fit-content',
               position: 'absolute',
-              bottom: '16px',
+              top: '16px',
+              right: '16px',
               color: blue[500],
               '&:hover': {
                 backgroundColor: '#fff',
