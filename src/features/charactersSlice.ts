@@ -1,11 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { NormalizedCharacterType } from '../types/CharacterType';
 
-interface allCharactersType {
+interface AllCharactersType {
   value: NormalizedCharacterType[] | []
 }
 
-const initialState: allCharactersType = {
+const initialState: AllCharactersType = {
   value: [],
 };
 

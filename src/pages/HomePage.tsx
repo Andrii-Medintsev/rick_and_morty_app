@@ -22,19 +22,26 @@ const Home = () => {
 
   const dispatch = useAppDispatch();
   const characters = useAppSelector((state) => state.characters.value);
+  const characterFilter = useAppSelector(state => state.charactersFilter.value)
+
 
   useEffect(() => {
-    getCharacters(currentPage).then((res) => {
+    getCharacters(currentPage, characterFilter).then((res) => {
       const results = res.results.map((c: CharacterTypeFromServer) => ({
         ...c,
         location: c.location.name,
         episode: c.episode[0].name,
       }));
 
+      if (!results.length) {
+        setNoQueryMatch(true);
+        return;
+      }
+
       dispatch(addCharacters(results));
       setPagesAmount(res.info.pages);
     });
-  }, [currentPage]);
+  }, [currentPage, characterFilter]);
 
   const handleAlertClose = (
     _event?: React.SyntheticEvent | Event,
@@ -63,10 +70,7 @@ const Home = () => {
     >
       {characters.length ? (
         <>
-          <Filter
-            onSetPages={setPagesAmount}
-            onChangeNoQueryMatch={setNoQueryMatch}
-          />
+          <Filter/>
 
           <Box
             sx={{

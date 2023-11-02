@@ -15,14 +15,14 @@ const capitalize = (word: string) => {
 
 const CharacterCard: React.FC<Props> = ({ character }) => {
   const dispatch = useAppDispatch();
-  const value = useAppSelector((state) => state.history.value);
+  const history = useAppSelector((state) => state.history.value);
 
   const handleAddToHistory = () => {
     dispatch(addHistoryItem(character.name));
 
     window.localStorage.setItem(
       'history',
-      JSON.stringify([...value, character.name])
+      JSON.stringify([...history, character.name])
     );
   };
 

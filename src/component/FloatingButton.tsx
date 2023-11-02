@@ -8,6 +8,7 @@ import { AiOutlineExclamationCircle } from 'react-icons/ai';
 import { FiDownload } from 'react-icons/fi';
 import { useLocation } from 'react-router-dom';
 import { useAppSelector } from '../app/hooks';
+import { CharactersFilterType } from '../types/CharactersFilterType';
 
 const FloatingButton = () => {
   const history = useAppSelector((state) => state.history.value);
@@ -41,6 +42,27 @@ const FloatingButton = () => {
     '&:disabled': {
       backgroundColor: grey[400],
     },
+  };
+
+  const convertFilterOption = (obj: CharactersFilterType) => {
+    const values = Object.values(obj).filter((item) => item);
+
+    return (
+      <Box sx={{ display: 'flex', gap: '10px' }}>
+        {values.map((item, i) => (
+          <Typography
+            key={i}
+            sx={{
+              backgroundColor: grey[200],
+              paddingX: '8px',
+              borderRadius: '5px',
+            }}
+          >
+            {item}
+          </Typography>
+        ))}
+      </Box>
+    );
   };
 
   return (
@@ -125,11 +147,35 @@ const FloatingButton = () => {
               }}
             >
               {history.map((item, i) => {
-                return (
-                  <Typography key={i}>
-                    {`You've watched info about ${item}`}
-                  </Typography>
-                );
+                if (typeof item === 'string') {
+                  return (
+                    <Box key={i}>
+                      <Typography sx={{ color: grey[500] }}>
+                        You've watched info about
+                      </Typography>
+                      <Typography
+                        key={i}
+                        sx={{
+                          backgroundColor: grey[200],
+                          paddingX: '8px',
+                          borderRadius: '5px',
+                          display: 'inline-block'
+                        }}
+                      >
+                        {item}
+                      </Typography>
+                    </Box>
+                  );
+                } else if (Object.values(item).filter((i) => i).length) {
+                  return (
+                    <Box key={i}>
+                      <Typography sx={{ color: grey[500] }}>
+                        Character:
+                      </Typography>
+                      {convertFilterOption(item)}
+                    </Box>
+                  );
+                }
               })}
             </Box>
           </Box>

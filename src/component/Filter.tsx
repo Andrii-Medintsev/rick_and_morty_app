@@ -1,19 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Box, Button, TextField } from '@mui/material';
 import { useState } from 'react';
-import { useAppDispatch } from '../app/hooks';
-import { addCharacters } from '../features/charactersSlice';
-import { CharacterTypeFromServer } from '../types/CharacterType';
-import { getCharacters } from '../utils/getCharacters';
+import { useAppDispatch, useAppSelector } from '../app/hooks';
+import { setCharactersFilter } from '../features/charactersFilterSlice';
 import { SelectItem } from './SelectItem';
+import { addHistoryItem } from '../features/historySlice';
 
-type Props = {
-  onSetPages: (pages: number) => void;
-  onChangeNoQueryMatch: (isVisible: boolean) => void;
-};
-
-const Filter: React.FC<Props> = ({ onSetPages, onChangeNoQueryMatch }) => {
+const Filter = () => {
   const dispatch = useAppDispatch();
+  const history = useAppSelector((state) => state.history.value);
+
   const [searchOptions, setSearchOption] = useState<string[]>([]);
   const [filterIsActive, setFilterIsActive] = useState(false);
 
@@ -46,28 +42,27 @@ const Filter: React.FC<Props> = ({ onSetPages, onChangeNoQueryMatch }) => {
 
   const handleFilterVisibility = () => {
     setFilterIsActive(!filterIsActive);
+    dispatch(
+      setCharactersFilter({
+        name: '',
+        status: '',
+        species: '',
+        type: '',
+        gender: '',
+      })
+    );
 
     resetQueries();
   };
 
   const handleSubmit = async () => {
-    const filterdCharacters = await getCharacters(1, characterQueries);
+    dispatch(setCharactersFilter(characterQueries));
+    dispatch(addHistoryItem(characterQueries));
 
-    console.log(filterdCharacters);
-
-    if (!filterdCharacters.results.length) {
-      onChangeNoQueryMatch(true);
-      return;
-    }
-
-    const results = filterdCharacters.results.map((c: CharacterTypeFromServer) => ({
-      ...c,
-      location: c.location.name,
-      episode: c.episode[0].name
-    }))
-
-    dispatch(addCharacters(results));
-    onSetPages(filterdCharacters.info.pages);
+    window.localStorage.setItem(
+      'history',
+      JSON.stringify([...history, characterQueries])
+    );
 
     resetQueries();
   };

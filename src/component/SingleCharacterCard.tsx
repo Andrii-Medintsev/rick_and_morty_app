@@ -47,7 +47,7 @@ const SingleCharacterCard = () => {
           display: 'flex',
           position: 'relative',
           flexDirection: 'column',
-          gap: '30px',
+          gap: '20px',
           padding: '40px',
         }}
       >
