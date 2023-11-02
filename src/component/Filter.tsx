@@ -3,25 +3,19 @@ import { Box, Button, TextField } from '@mui/material';
 import { useState } from 'react';
 import { useAppDispatch } from '../app/hooks';
 import { addCharacters } from '../features/charactersSlice';
-import { getCharactersByLocation } from '../utils/getCharactersByLocation';
-import { getFilteredCharacters } from '../utils/getFilteredCharacters';
+import { CharacterTypeFromServer } from '../types/CharacterType';
+import { getCharacters } from '../utils/getCharacters';
 import { SelectItem } from './SelectItem';
 
 type Props = {
-  // onSetCharacters: (c: CharacterType[]) => void;
   onSetPages: (pages: number) => void;
   onChangeNoQueryMatch: (isVisible: boolean) => void;
 };
 
-const Filter: React.FC<Props> = ({
-  // onSetCharacters,
-  onSetPages,
-  onChangeNoQueryMatch,
-}) => {
+const Filter: React.FC<Props> = ({ onSetPages, onChangeNoQueryMatch }) => {
   const dispatch = useAppDispatch();
   const [searchOptions, setSearchOption] = useState<string[]>([]);
-  const [filterVisible, setFilterVisible] = useState(false);
-  const [generalQuery, setGeneralQuery] = useState('');
+  const [filterIsActive, setFilterIsActive] = useState(false);
 
   const [characterQueries, setCharacterQueries] = useState({
     name: '',
@@ -31,22 +25,6 @@ const Filter: React.FC<Props> = ({
     gender: '',
   });
 
-  const [locationQueries, setLocationQueries] = useState({
-    name: '',
-    type: '',
-    dimension: '',
-  });
-
-  const [episodeQueries, setEpisodeQueries] = useState({
-    name: '',
-    episopdes: '',
-  });
-
-  const handleSearchOptions = (options: string[]) => {
-    setGeneralQuery('');
-    setSearchOption(options);
-  };
-
   const handleCharacterQuery = (prop: string, value: string) => {
     setCharacterQueries((prev) => {
       const newState = { ...prev, [prop]: value };
@@ -55,24 +33,7 @@ const Filter: React.FC<Props> = ({
     });
   };
 
-  const handleLocationQuery = (prop: string, value: string) => {
-    setLocationQueries((prev) => {
-      const newState = { ...prev, [prop]: value };
-
-      return newState;
-    });
-  };
-
-  const handleEpisodeQuery = (prop: string, value: string) => {
-    setEpisodeQueries((prev) => {
-      const newState = { ...prev, [prop]: value };
-
-      return newState;
-    });
-  };
-
   const resetQueries = () => {
-    setGeneralQuery('');
     setSearchOption([]);
     setCharacterQueries({
       name: '',
@@ -81,42 +42,32 @@ const Filter: React.FC<Props> = ({
       type: '',
       gender: '',
     });
-
-    setLocationQueries({
-      name: '',
-      type: '',
-      dimension: '',
-    });
-
-    setEpisodeQueries({
-      name: '',
-      episopdes: '',
-    });
   };
 
   const handleFilterVisibility = () => {
-    setFilterVisible(!filterVisible);
+    setFilterIsActive(!filterIsActive);
 
     resetQueries();
   };
 
-  // const handleModalClose = () => {
-  //   setFilterVisible(false);
-  // };
-
   const handleSubmit = async () => {
-    const filterdCharacters = await getFilteredCharacters(characterQueries);
-    const charactersByLocation = await getCharactersByLocation(locationQueries);
+    const filterdCharacters = await getCharacters(1, characterQueries);
 
-    console.log(charactersByLocation.results);
+    console.log(filterdCharacters);
 
-    if (!filterdCharacters.results.length || !charactersByLocation.results.length) {
+    if (!filterdCharacters.results.length) {
       onChangeNoQueryMatch(true);
       return;
     }
 
-    dispatch(addCharacters(filterdCharacters.results));
-    onSetPages(charactersByLocation.info.pages);
+    const results = filterdCharacters.results.map((c: CharacterTypeFromServer) => ({
+      ...c,
+      location: c.location.name,
+      episode: c.episode[0].name
+    }))
+
+    dispatch(addCharacters(results));
+    onSetPages(filterdCharacters.info.pages);
 
     resetQueries();
   };
@@ -128,13 +79,13 @@ const Filter: React.FC<Props> = ({
         sx={{ marginRight: '160px' }}
         onClick={handleFilterVisibility}
       >
-        {filterVisible ? 'Remove filter' : 'Filter'}
+        {filterIsActive ? 'Remove filter' : 'Filter'}
       </Button>
-      {filterVisible && (
+      {filterIsActive && (
         <Box sx={{ position: 'relative' }}>
           <SelectItem
             searchOptions={searchOptions}
-            onOptionChange={handleSearchOptions}
+            onOptionChange={(options: string[]) => setSearchOption(options)}
           />
           <Box
             sx={{
@@ -144,14 +95,14 @@ const Filter: React.FC<Props> = ({
               flexDirection: 'column',
               gap: '1px',
               overflow: 'visible',
-              zIndex: 5
+              zIndex: 5,
             }}
           >
             {!searchOptions.length && (
               <TextField
                 placeholder='Add keywords to find'
                 variant='outlined'
-                onChange={(e) => setGeneralQuery(e.target.value)}
+                disabled
               />
             )}
 
@@ -177,9 +128,7 @@ const Filter: React.FC<Props> = ({
                     key={item}
                     placeholder={`Add Location ${item}`}
                     variant='outlined'
-                    onChange={(e) =>
-                      handleLocationQuery(item.toLowerCase(), e.target.value)
-                    }
+                    onChange={() => {}}
                   />
                 ))}
               </>
@@ -192,9 +141,7 @@ const Filter: React.FC<Props> = ({
                     key={item}
                     placeholder={`Add ${item}`}
                     variant='outlined'
-                    onChange={(e) =>
-                      handleEpisodeQuery(item.toLowerCase(), e.target.value)
-                    }
+                    onChange={() => {}}
                   />
                 ))}
               </>
@@ -209,10 +156,6 @@ const Filter: React.FC<Props> = ({
           </Button>
         </Box>
       )}
-
-      {/* <Modal open={filterVisible} onClose={handleModalClose}>
-        <Box></Box>
-      </Modal> */}
     </Box>
   );
 };

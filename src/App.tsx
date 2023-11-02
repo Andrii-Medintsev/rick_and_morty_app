@@ -5,6 +5,7 @@ import Home from './pages/HomePage';
 import { Route, Routes } from 'react-router-dom';
 import { grey } from '@mui/material/colors';
 import CharacterPage from './pages/CharacterPage';
+import RedirectingPage from './pages/RedirectingPage';
 
 const theme = createTheme({
   components: {
@@ -85,6 +86,7 @@ const App = () => {
           <Routes>
             <Route path='/' element={<Home />} />
             <Route path='/character/:id' element={<CharacterPage />} />
+            <Route path='*' element={<RedirectingPage />}/>
           </Routes>
         </Box>
 

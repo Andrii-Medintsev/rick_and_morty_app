@@ -1,12 +1,12 @@
 import { Box, Card, CardContent, CardMedia, Typography } from '@mui/material';
 import { green } from '@mui/material/colors';
 import { Link } from 'react-router-dom';
-import { CharacterType } from '../types/CharacterType';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { addHistoryItem } from '../features/historySlice';
+import { NormalizedCharacterType } from '../types/CharacterType';
 
 type Props = {
-  character: CharacterType;
+  character: NormalizedCharacterType;
 };
 
 const capitalize = (word: string) => {
@@ -26,25 +26,30 @@ const CharacterCard: React.FC<Props> = ({ character }) => {
     );
   };
 
+  const {
+    name,
+    id,
+    species,
+    image,
+    status,
+    location,
+    episode
+  } = character;
+
   return (
     <Card
-      key={character.id}
+      key={id}
       sx={{
         display: 'flex',
         width: '48%',
-        maxWidth: '100%',
+        // maxWidth: '100%',
         flexGrow: 1,
         background: '#3C3E44',
         borderRadius: '9px',
         color: '#f5f5f5',
       }}
     >
-      <CardMedia
-        component='img'
-        sx={{ width: 220 }}
-        image={character.image}
-        alt={character.name}
-      />
+      <CardMedia component='img' sx={{ width: 220 }} image={image} alt={name} />
       <CardContent
         sx={{
           display: 'flex',
@@ -55,7 +60,7 @@ const CharacterCard: React.FC<Props> = ({ character }) => {
         <Box>
           <Typography
             variant='h5'
-            component='div'
+            // component='div'
             sx={{
               fontSize: 27,
               fontWeight: 800,
@@ -64,11 +69,8 @@ const CharacterCard: React.FC<Props> = ({ character }) => {
               },
             }}
           >
-            <Link
-              to={`/character/${character.id}`}
-              onClick={handleAddToHistory}
-            >
-              {character.name}
+            <Link to={`/character/${id}`} onClick={handleAddToHistory}>
+              {name}
             </Link>
           </Typography>
 
@@ -85,9 +87,9 @@ const CharacterCard: React.FC<Props> = ({ character }) => {
                 width: '9px',
                 height: '9px',
                 backgroundColor: `${
-                  character.status === 'Alive'
+                  status === 'Alive'
                     ? '#55CC44'
-                    : character.status === 'Dead'
+                    : status === 'Dead'
                     ? '#D63D2E'
                     : '#9e9e9e'
                 }`,
@@ -95,7 +97,7 @@ const CharacterCard: React.FC<Props> = ({ character }) => {
               },
             }}
           >
-            {`${capitalize(character.status)} - ${character.species}`}
+            {`${capitalize(status)} - ${species}`}
           </Typography>
         </Box>
 
@@ -116,7 +118,7 @@ const CharacterCard: React.FC<Props> = ({ character }) => {
               fontWeight: 400,
             }}
           >
-            {character.location.name}
+            {location}
           </Typography>
         </Box>
 
@@ -137,7 +139,7 @@ const CharacterCard: React.FC<Props> = ({ character }) => {
               fontWeight: 400,
             }}
           >
-            {character.episode[0].id}
+            {episode}
           </Typography>
         </Box>
       </CardContent>

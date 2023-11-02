@@ -2,22 +2,22 @@
 import {
   Alert,
   Box,
-  Pagination,
-  PaginationItem,
-  Snackbar,
+  Snackbar
 } from '@mui/material';
 import { useEffect, useState } from 'react';
+import { useAppDispatch, useAppSelector } from '../app/hooks';
 import CharacterCard from '../component/CharacterCard';
+import CustomPagination from '../component/CustomPagination';
 import Filter from '../component/Filter';
 import FloatingButton from '../component/FloatingButton';
 import Loader from '../component/Loader';
-import { getCharacters } from '../utils/getCharacters';
-import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { addCharacters } from '../features/charactersSlice';
+import { CharacterTypeFromServer } from '../types/CharacterType';
+import { getCharacters } from '../utils/getCharacters';
 
 const Home = () => {
   const [noQueryMatch, setNoQueryMatch] = useState(false);
-  const [pages, setPages] = useState(0);
+  const [pagesAmount, setPagesAmount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
 
   const dispatch = useAppDispatch();
@@ -25,12 +25,18 @@ const Home = () => {
 
   useEffect(() => {
     getCharacters(currentPage).then((res) => {
-      dispatch(addCharacters(res.results));
-      setPages(res.info.pages);
-    });
-  }, [dispatch]);
+      const results = res.results.map((c: CharacterTypeFromServer) => ({
+        ...c,
+        location: c.location.name,
+        episode: c.episode[0].name,
+      }));
 
-  const handleClose = (
+      dispatch(addCharacters(results));
+      setPagesAmount(res.info.pages);
+    });
+  }, [currentPage]);
+
+  const handleAlertClose = (
     _event?: React.SyntheticEvent | Event,
     reason?: string
   ) => {
@@ -41,31 +47,26 @@ const Home = () => {
     setNoQueryMatch(false);
   };
 
+  const handlePageChange = (_: React.ChangeEvent<unknown>, value: number) => {
+    setCurrentPage(value);
+    window.scrollTo(0, 0);
+  };
+
   return (
     <Box
-      sx={{ maxWidth: '1280px', height: '100%', margin: 'auto', zIndex: 10 }}
+      sx={{
+        maxWidth: '1280px',
+        height: '100%',
+        margin: 'auto',
+        zIndex: 10,
+      }}
     >
       {characters.length ? (
         <>
           <Filter
-            onSetPages={setPages}
+            onSetPages={setPagesAmount}
             onChangeNoQueryMatch={setNoQueryMatch}
           />
-
-          <Snackbar
-            open={noQueryMatch}
-            autoHideDuration={5000}
-            onClose={handleClose}
-          >
-            <Alert
-              onClose={handleClose}
-              severity='info'
-              variant='filled'
-              sx={{ width: '100%' }}
-            >
-              No such characters
-            </Alert>
-          </Snackbar>
 
           <Box
             sx={{
@@ -87,30 +88,22 @@ const Home = () => {
             <FloatingButton />
           </Box>
 
-          <Pagination
-            count={pages}
-            page={currentPage}
-            onChange={(_, value) => setCurrentPage(value)}
-            size='large'
-            variant='outlined'
-            shape='rounded'
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              height: '44px',
-            }}
-            renderItem={(item) => (
-              <PaginationItem
-                sx={{
-                  backgroundColor: '#3C3E44',
-                  '&:hover': {
-                    backgroundColor: '#3C3E44',
-                  },
-                }}
-                {...item}
-              />
-            )}
-          />
+          <CustomPagination pagesAmount={pagesAmount} currentPage={currentPage} onPageChange={handlePageChange} />
+
+          <Snackbar
+            open={noQueryMatch}
+            autoHideDuration={5000}
+            onClose={handleAlertClose}
+          >
+            <Alert
+              onClose={handleAlertClose}
+              severity='info'
+              variant='filled'
+              sx={{ width: '100%' }}
+            >
+              No such characters
+            </Alert>
+          </Snackbar>
         </>
       ) : (
         <Loader />

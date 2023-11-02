@@ -1,7 +1,6 @@
-import { EpisodeType } from './EpisodeType';
 
-export type CharacterType = {
-  id: number;
+export type CharacterTypeFromServer = {
+  id: string;
   name: string;
   status: string;
   species: string;
@@ -11,5 +10,19 @@ export type CharacterType = {
     name: string;
   };
   image: string;
-  episode: EpisodeType[];
+  episode: {
+    name: string
+  }[];
+};
+
+export type NormalizedCharacterType = {
+  id: string;
+  name: string;
+  status: string;
+  species: string;
+  type: string;
+  gender: string;
+  location: string;
+  image: string;
+  episode: string;
 };

@@ -1,9 +1,35 @@
 import { queryFetch } from './queryFetch';
 
-export const getCharacters = (page: number) => {
+interface Filter {
+  name?: string;
+  status?: string;
+  species?: string;
+  type?: string;
+  gender?: string;
+}
+
+export const getCharacters = (
+  page: number,
+  {
+    name = "",
+    status = "",
+    species = "",
+    type = "",
+    gender = ""
+  }: Filter = {}
+  ) => {
   return queryFetch(`
     query {
-      characters (page: ${page}) {
+      characters (
+        page: ${page},
+        filter: {
+          name: "${name}"
+          status: "${status}"
+          species: "${species}"
+          type: "${type}"
+          gender: "${gender}"
+        }
+      ) {
         info {
           count
           pages
@@ -12,15 +38,15 @@ export const getCharacters = (page: number) => {
         results {
           id
           name
-          image
-          status
           species
+          status
           location {
             name
           }
           episode {
-            id
+            name
           }
+          image
         }
       }
     }

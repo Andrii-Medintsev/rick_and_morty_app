@@ -75,7 +75,10 @@ const FloatingButton = () => {
             disabled={location.pathname !== '/'}
             sx={smallButtonStyle}
           >
-            <CSVLink data={characters}>
+            <CSVLink
+              data={characters}
+              filename={'rick_and_morty_characters.csv'}
+            >
               <FiDownload />
             </CSVLink>
           </IconButton>
@@ -94,7 +97,7 @@ const FloatingButton = () => {
           sx: {
             height: '570px',
             width: '420px',
-            top: '33%',
+            top: '23%',
             padding: '16px',
             borderRadius: '10px 0 0 10px',
           },
@@ -121,9 +124,9 @@ const FloatingButton = () => {
                 overflow: 'scroll',
               }}
             >
-              {history.map((item) => {
+              {history.map((item, i) => {
                 return (
-                  <Typography key={item}>
+                  <Typography key={i}>
                     {`You've watched info about ${item}`}
                   </Typography>
                 );

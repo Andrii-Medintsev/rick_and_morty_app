@@ -1,8 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { CharacterType } from '../types/CharacterType';
+import { NormalizedCharacterType } from '../types/CharacterType';
 
 interface allCharactersType {
-  value: CharacterType[]
+  value: NormalizedCharacterType[] | []
 }
 
 const initialState: allCharactersType = {
@@ -13,7 +13,7 @@ const allCharactersSlice = createSlice({
   name: 'allCharacters',
   initialState,
   reducers: {
-    addCharacters(state, action: PayloadAction<CharacterType[]>) {
+    addCharacters(state, action: PayloadAction<NormalizedCharacterType[]>) {
       state.value = action.payload;
     }
   }

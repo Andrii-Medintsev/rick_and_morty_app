@@ -1,25 +1,21 @@
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { CharacterType } from '../types/CharacterType';
-import { getCharacter } from '../utils/getCharacter';
-import SingleCharacterCard from '../component/SingleCharacterCard';
-import FloatingButton from '../component/FloatingButton';
 import { Box } from '@mui/material';
+import { useParams } from 'react-router-dom';
+import { useAppSelector } from '../app/hooks';
+import FloatingButton from '../component/FloatingButton';
 import Loader from '../component/Loader';
+import SingleCharacterCard from '../component/SingleCharacterCard';
 
 const CharacterPage = () => {
-  const [character, setCharacter] = useState<CharacterType>();
   const id = useParams().id;
 
-  useEffect(() => {
-    getCharacter(id).then((res) => setCharacter(res));
-  }, [id]);
+  const characters = useAppSelector(state => state.characters.value);
+  const character = characters.find(c => String(c.id) === id);
 
   return (
     <Box sx={{ position: 'relative', height: '100%', width: '100%' }}>
       {character ? (
         <>
-          {character && <SingleCharacterCard character={character} />}
+          {character && <SingleCharacterCard />}
           <FloatingButton />
         </>
       ) : (
