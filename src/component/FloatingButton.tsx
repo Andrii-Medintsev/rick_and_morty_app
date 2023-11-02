@@ -1,17 +1,21 @@
 import { MoreVertOutlined } from '@mui/icons-material';
 import ClearIcon from '@mui/icons-material/Clear';
 import { Box, Button, Drawer, IconButton, Typography } from '@mui/material';
-import { blue } from '@mui/material/colors';
+import { blue, grey } from '@mui/material/colors';
 import { useState } from 'react';
+import { CSVLink } from 'react-csv';
 import { AiOutlineExclamationCircle } from 'react-icons/ai';
 import { FiDownload } from 'react-icons/fi';
 import { useLocation } from 'react-router-dom';
 import { useAppSelector } from '../app/hooks';
 
 const FloatingButton = () => {
-  const value = useAppSelector((state) => state.history.value);
-  const [isActive, setIsActive] = useState(false);
+  const history = useAppSelector((state) => state.history.value);
+  const characters = useAppSelector((state) => state.characters.value);
+
   const location = useLocation();
+
+  const [isActive, setIsActive] = useState(false);
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
 
   const toggleDrawer = (event: React.KeyboardEvent | React.MouseEvent) => {
@@ -24,6 +28,19 @@ const FloatingButton = () => {
     }
 
     setDrawerIsOpen(false);
+  };
+
+  const smallButtonStyle = {
+    width: 40,
+    height: 40,
+    backgroundColor: '#fff',
+    color: '#3C3E44',
+    '&:hover': {
+      backgroundColor: grey[300],
+    },
+    '&:disabled': {
+      backgroundColor: grey[400],
+    },
   };
 
   return (
@@ -49,21 +66,26 @@ const FloatingButton = () => {
           }}
         >
           <IconButton
-            sx={{ width: 40, height: 40 }}
+            sx={smallButtonStyle}
             onClick={() => setDrawerIsOpen(true)}
           >
             <AiOutlineExclamationCircle />
           </IconButton>
           <IconButton
             disabled={location.pathname !== '/'}
-            sx={{ width: 40, height: 40 }}
+            sx={smallButtonStyle}
           >
-            <FiDownload />
+            <CSVLink data={characters}>
+              <FiDownload />
+            </CSVLink>
           </IconButton>
         </Box>
       )}
 
-      <IconButton onClick={() => setIsActive(!isActive)}>
+      <IconButton
+        onClick={() => setIsActive(!isActive)}
+        sx={{ ...smallButtonStyle, width: 56, height: 56 }}
+      >
         {!isActive ? <MoreVertOutlined /> : <ClearIcon />}
       </IconButton>
 
@@ -82,7 +104,7 @@ const FloatingButton = () => {
         onClose={toggleDrawer}
       >
         <Box>
-          <Box >
+          <Box>
             <Typography
               fontSize={20}
               fontWeight={500}
@@ -99,7 +121,7 @@ const FloatingButton = () => {
                 overflow: 'scroll',
               }}
             >
-              {value.map((item) => {
+              {history.map((item) => {
                 return (
                   <Typography key={item}>
                     {`You've watched info about ${item}`}

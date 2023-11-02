@@ -7,6 +7,7 @@ export const getCharacters = (page: number) => {
         info {
           count
           pages
+          next
         }
         results {
           id

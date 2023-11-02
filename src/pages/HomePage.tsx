@@ -11,21 +11,24 @@ import CharacterCard from '../component/CharacterCard';
 import Filter from '../component/Filter';
 import FloatingButton from '../component/FloatingButton';
 import Loader from '../component/Loader';
-import { CharacterType } from '../types/CharacterType';
 import { getCharacters } from '../utils/getCharacters';
+import { useAppDispatch, useAppSelector } from '../app/hooks';
+import { addCharacters } from '../features/charactersSlice';
 
 const Home = () => {
-  const [characters, setCharacters] = useState<CharacterType[] | []>([]);
   const [noQueryMatch, setNoQueryMatch] = useState(false);
   const [pages, setPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
 
+  const dispatch = useAppDispatch();
+  const characters = useAppSelector((state) => state.characters.value);
+
   useEffect(() => {
     getCharacters(currentPage).then((res) => {
-      setCharacters(res.results.slice(0, 6));
+      dispatch(addCharacters(res.results));
       setPages(res.info.pages);
     });
-  }, [currentPage]);
+  }, [dispatch]);
 
   const handleClose = (
     _event?: React.SyntheticEvent | Event,
@@ -39,14 +42,16 @@ const Home = () => {
   };
 
   return (
-    <Box sx={{ maxWidth: '1280px', height: '100%', margin: 'auto' }}>
+    <Box
+      sx={{ maxWidth: '1280px', height: '100%', margin: 'auto', zIndex: 10 }}
+    >
       {characters.length ? (
         <>
           <Filter
-            onSetCharacters={setCharacters}
             onSetPages={setPages}
             onChangeNoQueryMatch={setNoQueryMatch}
           />
+
           <Snackbar
             open={noQueryMatch}
             autoHideDuration={5000}

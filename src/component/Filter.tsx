@@ -1,22 +1,24 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Box, Button, TextField } from '@mui/material';
 import { useState } from 'react';
-import { CharacterType } from '../types/CharacterType';
+import { useAppDispatch } from '../app/hooks';
+import { addCharacters } from '../features/charactersSlice';
 import { getCharactersByLocation } from '../utils/getCharactersByLocation';
 import { getFilteredCharacters } from '../utils/getFilteredCharacters';
 import { SelectItem } from './SelectItem';
 
 type Props = {
-  onSetCharacters: (c: CharacterType[]) => void;
+  // onSetCharacters: (c: CharacterType[]) => void;
   onSetPages: (pages: number) => void;
   onChangeNoQueryMatch: (isVisible: boolean) => void;
 };
 
 const Filter: React.FC<Props> = ({
-  onSetCharacters,
+  // onSetCharacters,
   onSetPages,
   onChangeNoQueryMatch,
 }) => {
+  const dispatch = useAppDispatch();
   const [searchOptions, setSearchOption] = useState<string[]>([]);
   const [filterVisible, setFilterVisible] = useState(false);
   const [generalQuery, setGeneralQuery] = useState('');
@@ -113,7 +115,7 @@ const Filter: React.FC<Props> = ({
       return;
     }
 
-    onSetCharacters(filterdCharacters.results);
+    dispatch(addCharacters(filterdCharacters.results));
     onSetPages(charactersByLocation.info.pages);
 
     resetQueries();
@@ -142,6 +144,7 @@ const Filter: React.FC<Props> = ({
               flexDirection: 'column',
               gap: '1px',
               overflow: 'visible',
+              zIndex: 5
             }}
           >
             {!searchOptions.length && (

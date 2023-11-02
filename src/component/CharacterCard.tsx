@@ -13,10 +13,9 @@ const capitalize = (word: string) => {
   return word[0].toUpperCase() + word.slice(1).toLowerCase();
 };
 
-
 const CharacterCard: React.FC<Props> = ({ character }) => {
   const dispatch = useAppDispatch();
-  const value = useAppSelector(state => state.history.value);
+  const value = useAppSelector((state) => state.history.value);
 
   const handleAddToHistory = () => {
     dispatch(addHistoryItem(character.name));
@@ -25,7 +24,7 @@ const CharacterCard: React.FC<Props> = ({ character }) => {
       'history',
       JSON.stringify([...value, character.name])
     );
-  }
+  };
 
   return (
     <Card
