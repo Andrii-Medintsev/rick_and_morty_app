@@ -84,7 +84,7 @@ const App = () => {
           }}
         >
           <Routes>
-            <Route path='/' element={<Home />} />
+            <Route index path='/' element={<Home />} />
             <Route path='/character/:id' element={<CharacterPage />} />
             <Route path='*' element={<RedirectingPage />}/>
           </Routes>
