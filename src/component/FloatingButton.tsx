@@ -142,7 +142,7 @@ const FloatingButton = () => {
               sx={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '6px',
+                gap: '10px',
                 overflow: 'scroll',
               }}
             >

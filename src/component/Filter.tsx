@@ -6,7 +6,11 @@ import { setCharactersFilter } from '../features/charactersFilterSlice';
 import { SelectItem } from './SelectItem';
 import { addHistoryItem } from '../features/historySlice';
 
-const Filter = () => {
+type Props = {
+  onSetCurrentPage: (page: number) => void;
+};
+
+const Filter: React.FC<Props> = ({ onSetCurrentPage }) => {
   const dispatch = useAppDispatch();
   const history = useAppSelector((state) => state.history.value);
 
@@ -63,6 +67,8 @@ const Filter = () => {
       'history',
       JSON.stringify([...history, characterQueries])
     );
+
+    onSetCurrentPage(1);
 
     resetQueries();
   };

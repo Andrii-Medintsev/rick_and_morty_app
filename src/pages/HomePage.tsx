@@ -70,7 +70,7 @@ const Home = () => {
     >
       {characters.length ? (
         <>
-          <Filter/>
+          <Filter onSetCurrentPage={setCurrentPage}/>
 
           <Box
             sx={{
